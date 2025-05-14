@@ -1,0 +1,33 @@
+.loginform{
+	margin-bottom: 5%;
+}
+*{
+	box-sizing: border-box;
+	
+}
+
+.index-nav{
+	display: flex;
+	flex-direction: row;
+}
+
+.header{
+	display: flex;
+	justify-content: center;
+
+}
+.title{
+	border: none;
+	font-size: larger;
+	width: 100%;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+.contents{
+	width: 100%;
+}
+.noteblock{
+	background-color: green;
+	border: solid black 1px;
+	
+}
