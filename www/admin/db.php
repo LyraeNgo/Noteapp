@@ -6,7 +6,7 @@
     $host = 'mysql-server'; // tên mysql server
     $user = 'root';
     $pass = 'root';
-    $db = 'note_management'; // tên databse
+    $db = 'noteapp'; // tên databse
 	if($_SESSION['username']!='admin'){
 		
 		echo "<script>alert('You do not have permission to access this page!'); window.location.href='/index.php';</script>";
@@ -20,7 +20,7 @@
 
 	echo "Kết nối thành công tới database<br><br>";
 
-	$sql = "SELECT * from Users";
+	$sql = "SELECT * from user";
 	$result = $conn->query($sql);
 
 	if ($result->num_rows > 0) {

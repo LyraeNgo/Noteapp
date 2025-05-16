@@ -1,22 +1,13 @@
 <?php
 session_start();
-$user = '';
-$pass = '';
-$error = '';
 
-$servername = "mysql-server";
-$username = "root";
-$password = "root";
-$dbname = "note_management";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+require_once("../admin/db-con.php");
+$conn=create_connection();
+if (!$conn) {
+    die("Connection failed.");
 }
-
+$user="";
+$pass= "";
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $user = trim($_POST['username']);
     $pass = trim($_POST['password']);
@@ -29,7 +20,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $error = 'Please enter your password';
     } else {
         // Prepare and bind AFTER getting the values
-        $stmt = $conn->prepare("SELECT username FROM Users WHERE username = ? AND password = ?");
+        $stmt = $conn->prepare("SELECT display_name FROM user WHERE display_name = ? AND password = ?");
         $stmt->bind_param("ss", $user, $pass);
 
         $stmt->execute();

@@ -5,76 +5,77 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
+require_once('../admin/db-con.php');
 
-$error = ''; // define error at the top, globally
-$username='';
-$password= '';
-$emailUser= '';
-if (isset($_POST['username'])&&isset( $_POST['password']) && isset($_POST['email'])) {
-    // Get user input from form
-    $username = $_POST['username'];
-    $emailUser = $_POST['email'];
-    $password = $_POST['password'];
-    $confirm= $_POST['confirmpass'];
-    // Database connection
-    $host = 'mysql-server';
-    $user = 'root';
-    $pass = 'root';
-    $db = 'note_management';
+$conn = create_connection();
+$error = '';
+$username = '';
+$emailUser = '';
+$password = '';
+function generateRandomString($length = 6) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
 
-    $conn = new mysqli($host, $user, $pass, $db);
-
-    if ($conn->connect_error) {
-        die('Connection failed: ' . $conn->connect_error);
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[random_int(0, $charactersLength - 1)];
     }
-    // check if email and username are used for register
-    $stmt = $conn->prepare("SELECT * FROM Users WHERE email = ? or username=?");
-    $stmt->bind_param("ss", $emailUser,$username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if(empty($username)||empty($emailUser)||empty($password)||empty($confirm)){
-        $error = "please enter username password and email";
-    }
-    else if ($result->num_rows > 0) {
-        $error = 'This email or username already used!';
-    } else if($password != $confirm) {
-        $error = 'incorrect confirm password';
-    }
-    else {
-        // Insert user into database safely
-        $stmt = $conn->prepare("INSERT INTO Users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $emailUser, $password);
 
-        if ($stmt->execute()) {
-            header("Location: /pages/login.php");
-            echo "<script>alert('Registration successful!');</script>";
+    return $randomString;
+}
 
-            // Send confirmation email
-            $subject = "Welcome to Our Website!";
-            $body = "<h1>Hello, $username!</h1><p>Thank you for registering with us. Your registration is successful.</p>";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $emailUser = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm = $_POST['confirmpass'] ?? '';
+    $token=generateRandomString();
+    if (empty($username) || empty($emailUser) || empty($password) || empty($confirm)) {
+        $error = "Please enter username, email, and password.";
+    } elseif ($password !== $confirm) {
+        $error = "Confirm password does not match.";
+    } else {
+        // Check if email or username already exists
+        $stmt = $conn->prepare("SELECT * FROM user WHERE email = ? OR display_name = ?");
+        $stmt->bind_param("ss", $emailUser, $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-            if (send_mail($emailUser, $subject, $body)) {
-                echo "<script>alert('A confirmation email has been sent to your address.');</script>";
-            } else {
-                echo "<script>alert('Failed to send the confirmation email.');</script>";
-            };
-            
+        if ($result->num_rows > 0) {
+            $error = "This email or username is already used!";
         } else {
-            $error = "Error: " . $stmt->error;
-        }
-        
-    }
+            
+            // Insert new user
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Secure password
+            $stmt = $conn->prepare("INSERT INTO user (display_name, email, password,is_activated,token) VALUES (?, ?, ?,0,'$token')");
+            $stmt->bind_param("sss", $username, $emailUser, $hashedPassword);
 
-    $stmt->close();
+            if ($stmt->execute()) {
+                // Send welcome email
+                $subject = "Welcome to Our Website!";
+                $body = "<h1>Hello, $username!</h1><p>Thank you for registering with us. Please activate your account by clicking to the link below.</p></br><a href='Noteapp\www\pages\acitvate.php'> here</a>";
+                send_mail($emailUser, $subject, $body);
+
+                // Redirect to index
+                $_SESSION['username']=$username;
+
+                header("Location: /index.php");
+                exit;
+            } else {
+                $error = "Database error: " . $stmt->error;
+            }
+        }
+        $stmt->close();
+    }
     $conn->close();
 }
 
-// PHPMailer send_mail function
+// Send email function
 function send_mail($to, $subject, $body) {
-    $emailSender = "ngominhtam26112005@gmail.com";  
-    $password = "nrekywgaozbbxaii";  
-    $first_name = "Tam";    
-    $last_name = "Ngo";      
+    $emailSender = "ngominhtam26112005@gmail.com";
+    $password = "nrekywgaozbbxaii";
+    $first_name = "Tam";
+    $last_name = "Ngo";
 
     $mail = new PHPMailer(true);
     try {
@@ -85,15 +86,15 @@ function send_mail($to, $subject, $body) {
         $mail->Password = $password;
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
-        $mail->setFrom($emailSender, $first_name . ' ' . $last_name);
-        $mail->addAddress($to); 
+        $mail->setFrom($emailSender, "$first_name $last_name");
+        $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $body;
         $mail->send();
         return true;
     } catch (Exception $e) {
-        return $mail->ErrorInfo;
+        return false; // Optional: Log error
     }
 }
 ?>
@@ -149,7 +150,7 @@ function send_mail($to, $subject, $body) {
             </div> 
 
         </div>
-
+        
 	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

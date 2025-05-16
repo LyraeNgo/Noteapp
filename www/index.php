@@ -1,67 +1,113 @@
 <?php
-	session_start();
-	if(!isset($_SESSION['username'])){
-		header("Location: /pages/login.php");
-		die();
-	};
+  session_start();
+  require_once("./admin/db-con.php");
+  if (!isset($_SESSION['username'])) {
+    header("Location: /pages/login.php");
+    die();
+  }
+
+  $conn=create_connection();
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/style.css"> <!-- Sử dụng link tuyệt đối tính từ root, vì vậy có dấu / đầu tiên -->
-	<title>Home Page</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/style.css"/>
+  <title>Home Page</title>
 </head>
+<body style="background: green">
 
-<body>
+  <!-- Navigation -->
+  <div class="container-fluid bg-light py-2">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+      <a class="btn btn-outline-primary m-2" href="/pages/logout.php">Signout</a>
 
-	<div class="indexfield">	
-		<div class="index-nav" >
-			<a class="btn btn-outline-primary border m-3" type="button" href="/pages/logout.php">Signout</a>
-			<!-- admin permission -->
-			<?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') { ?>
-				<div><a href="/admin/db.php" class="btn btn-primary m-3">Go to Admin Page</a></div>
-			<?php } ?>
-		</div>
-		<div class="header">
-				<h1>WELCOME TO NOTETATION, <?= $_SESSION['username']?></h1>
-		</div>
-	</div>
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	<script src="/main.js"></script> <!-- Sử dụng link tuyệt đối tính từ root, vì vậy có dấu / đầu tiên -->
-
-	<div class="create" >
-		<button class="btn btn-warning m-3 rounded" id="create"> Create Note</button>
-	</div>
-	<div class="note-form container border" id="note-form" style="display:none">
-		<div class="form-group">
-			<input id="title" class="title" type="text" name="title" placeholder="Title">
-		</div>
-		<div class="form-group">
-			<input id="contents" class="contents" type="text" name="contents" placeholder="take notes here">
-		</div>
+      <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') { ?>
+        <a href="/admin/db.php" class="btn btn-primary m-2">Go to Admin Page</a>
+      <?php } ?>
     </div>
-	<div class="noteshow">
-		<div class="row d-flex justify-content-around">
-			<?php for ($i = 0; $i < 10; $i++) {?>
-				<!-- test -->
-				<div class="col-2 noteblock m-2">
-					<div class="titlePlace">Title</div>
-					<div class="contentsPlace">hehehhe, <?=$i?></div>
-				</div>
-			<?php } ?>
-		</div>
-	</div>
+  </div>
+
+  <!-- Header -->
+  <div class="container text-center my-4 bg-dark text-white">
+    <h1 >WELCOME TO NOTETATION, <?= $_SESSION['username'] ?></h1>
+  </div>
+
+  <!-- Create + Search -->
+  <div class="container mb-4">
+    <div class="row align-items-center">
+      <div class="col-12 col-md-3 mb-2">
+        <button class="btn btn-warning w-100" id="create">Create Note</button>
+      </div>
+      <div class="col-12 col-md-9">
+        <form action="" method="get">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary">Find</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note Form -->
+  <div class="container mb-4" id="note-form" style="display: none">
+    <div class="card p-3">
+      <div class="form-group">
+        <input id="title" class="form-control mb-2" type="text" name="title" placeholder="Title"/>
+      </div>
+      <div class="form-group">
+        <input id="contents" class="form-control" type="text" name="contents" placeholder="Take notes here"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note Display -->
+  <div class="container">
+    <div class="row d-flex ">
+      <?php 
+	  	$sql="select * from user,note";
+	 
+	 	for ($i = 0; $i < 10; $i++) { ?>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+  <div class="border rounded p-3 shadow-sm h-100 bg-white">
+
+    <!-- Title & 3-dot menu -->
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="font-weight-bold text-truncate" style="max-width: 85%;">Title <?= $i ?></div>
+
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+          <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="#">Modify</a>
+          <a class="dropdown-item text-danger" href="#">Delete</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note content -->
+    <div class="text-muted text-truncate mt-2">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
+  </div>
+</div>
+
+      <?php } ?>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/main.js"></script>
 </body>
-
-
 </html>
