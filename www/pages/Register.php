@@ -12,7 +12,7 @@ $error = '';
 $username = '';
 $emailUser = '';
 $password = '';
-function generateRandomString($length = 6) {
+function generateRandomString($length = 32) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
     $randomString = '';
@@ -53,7 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute()) {
                 // Send welcome email
                 $subject = "Welcome to Our Website!";
-                $body = "<h1>Hello, $username!</h1><p>Thank you for registering with us. Please activate your account by clicking to the link below.</p></br><a href='Noteapp\www\pages\acitvate.php'> here</a>";
+                $body = "<h1>Hello, $username!</h1>
+                    <p>Thank you for registering with us. Please activate your account by clicking the link below. Your activation code is: <strong>$token</strong></p>
+                    <br><a href='http://localhost:8080/pages/activate.php?email=$emailUser&token=$token'>Click here to activate your account</a>";
                 send_mail($emailUser, $subject, $body);
 
                 // Redirect to index
