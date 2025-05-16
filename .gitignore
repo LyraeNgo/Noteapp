@@ -1,1 +1,6 @@
-mysql/sql/
+data/
+*.pem
+*.ibd
+*.dblwr
+*.cnf
+*.log
