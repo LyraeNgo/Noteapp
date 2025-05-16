@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="/style.css"/>
   <title>Home Page</title>
 </head>
-<body style="background: green">
+<body >
 
   <!-- Navigation -->
   <div class="container-fluid bg-light py-2">
@@ -33,13 +33,27 @@
       <?php } ?>
     </div>
   </div>
+  <?php 
+    $username=$_SESSION['username'];
+    $sql='SELECT is_activated FROM user WHERE display_name=?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
 
+
+    if($row['is_activated']===0){?>
+      <div class=" m-3 p-3 alert alert-warning w-25 float-right" > Please activate your account using the email sent to you.</div>
+    <?php }
+  ?>
   <!-- Header -->
   <div class="container text-center my-4 bg-dark text-white">
     <h1 >WELCOME TO NOTETATION, <?= $_SESSION['username'] ?></h1>
   </div>
 
-  <!-- Create + Search -->
+  <!-- Create and Search -->
   <div class="container mb-4">
     <div class="row align-items-center">
       <div class="col-12 col-md-3 mb-2">
