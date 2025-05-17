@@ -29,5 +29,38 @@
 .noteblock{
 	background-color: green;
 	border: solid black 1px;
-	
+}
+
+/* View mode styles */
+#notes-container.list-view {
+    display: flex;
+    flex-direction: column;
+}
+
+#notes-container.list-view .note-item {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+}
+
+#notes-container.list-view .note-item .border {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+#notes-container.list-view .note-item .font-weight-bold {
+    margin-right: 1rem;
+    min-width: 200px;
+}
+
+#notes-container.list-view .note-item .text-muted {
+    flex: 1;
+    margin: 0;
+}
+
+/* Active button style */
+.btn-group .btn.active {
+    background-color: #007bff;
+    color: white;
 }
