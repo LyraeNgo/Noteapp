@@ -64,3 +64,22 @@
     background-color: #007bff;
     color: white;
 }
+
+.custom-file-input { display: none; }
+
+.custom-file-label {
+    padding: 15px;
+	width:auto ;
+    background: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+.modal-header form {
+  width: 100%;
+}
+.modal-body form {
+  width: 100%;
+}

@@ -10,6 +10,9 @@
 
 ?>
 
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,24 +63,28 @@
   <div class="container mb-4">
     <div class="row align-items-center">
       <div class="col-12 col-md-3 mb-2">
-        <button class="btn btn-warning w-100" id="create">Create Note</button>
+        <button type="button" class="btn btn-warning w-100" data-toggle="modal" data-target="#myModal">Create Note</button>
       </div>
-      <div class="col-12 col-md-7">
+
+      
+      <div class="col-12 col-md-9">
         <form action="" method="get">
-          <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
+            <div class="input-group">
+              <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">Find</button>
             </div>
           </div>
         </form>
+
       </div>
+    
       <div class="col-12 col-md-2 mb-2">
         <div class="btn-group w-100">
-          <button class="btn btn-outline-primary active" id="grid-view">
+          <button class="btn btn-outline-primary active" id="grid-view"  onclick="toggleView('grid')" >
             <i class="fas fa-th-large"></i>
           </button>
-          <button class="btn btn-outline-primary" id="list-view">
+          <button class="btn btn-outline-primary" id="list-view"  onclick="toggleView('list')" >
             <i class="fas fa-list"></i>
           </button>
         </div>
@@ -85,48 +92,90 @@
     </div>
   </div>
 
-  <!-- Note Form -->
-  <div class="container mb-4" id="note-form" style="display: none">
-    <div class="card p-3">
-      <div class="form-group">
-        <input id="title" class="form-control mb-2" type="text" name="title" placeholder="Title"/>
-      </div>
-      <div class="form-group">
-        <input id="contents" class="form-control" type="text" name="contents" placeholder="Take notes here"/>
-      </div>
-    </div>
-  </div>
+  <!-- Note Form by TaPu-->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
 
-  <!-- Note Display -->
-  <div class="container">
-    <div class="row" id="notes-container">
-      <?php 
-	  	$sql="select * from user,note";
-	 
-	 	for ($i = 0; $i < 50; $i++) { ?>
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
-  <div class="border rounded p-3 shadow-sm h-100 bg-white">
-    <!-- Title -->
-    <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">Title <?= $i ?></div>
-
-    <!-- Content + kebab menu -->
-    <div class="d-flex justify-content-between align-items-start">
-      <div class="text-muted text-truncate">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
-
-      <div class="dropdown ml-2">
-        <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
-          <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="#">Modify</a>
-          <a class="dropdown-item text-danger" href="#">Delete</a>
+    <form id="noteForm" action="Note/save_note.php" method="POST" enctype="multipart/form-data">
+      <div class="modal-content">
+        <div class="modal-header">
+          <input id="title" class="form-control mb-2" type="text" name="title" placeholder="Title" />
         </div>
+        <div class="modal-body">
+          <input type="hidden" name="note_id" value="<?= $_GET['id'] ?? '' ?>">
+          <textarea name="content" placeholder="Content" id="content" style="width: 100%; height:150px"></textarea>
+        </div>
+        <!-- 
+        <div class="modal-body">
+          <input type="file" name="image" id="imageInput" class="custom-file-input" accept="image/*">
+          <label for="imageInput" class="custom-file-label" style="padding:8px 12px;">Choose Image</label>
+          <br><br>
+          <span id="file-name" style="color:red;"></span>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" id="saveBtn" data-dismiss="modal">Close</button>
+        </div>
+        -->
       </div>
-    </div>
+    </form>
+
   </div>
 </div>
 
-      <?php } ?>
+  <!-- Note Display -->
+  <div class="container">
+  <div id="notesContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    <?php
+    require_once('admin/db-con.php');
+    $conn = create_connection();
+    $user_id = $_SESSION['user_id'] ?? null;
+
+    if ($user_id) {
+        $stmt = $conn->prepare("SELECT tieu_de, noi_dung FROM note WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($note = $result->fetch_assoc()):
+    ?>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+        <div class="border rounded p-3 shadow-sm h-100 bg-white">
+
+          <!-- Title -->
+          <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">
+            <?= htmlspecialchars($note['tieu_de']) ?>
+          </div>
+
+          <!-- Content + kebab menu -->
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="text-muted text-truncate" style="max-width: 85%;">
+              <?= htmlspecialchars($note['noi_dung']) ?>
+            </div>
+
+            <div class="dropdown ml-2">
+              <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+                <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="Note/Edit_note.php">Modify</a>
+                <a class="dropdown-item text-danger" href="">Delete</a>
+        </div>
+      </div>
+    </div>
+      </div>
+        </div>
+          <?php
+              endwhile;
+              $stmt->close();
+          } else {
+              echo '<p class="text-white">Vui lòng đăng nhập để xem ghi chú.</p>';
+          }
+
+          $conn->close();
+        ?>
+        </div>
+      </div>
     </div>
   </div>
 
