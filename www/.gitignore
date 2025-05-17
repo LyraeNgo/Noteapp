@@ -1,6 +1,1 @@
-data/
-*.pem
-*.ibd
-*.dblwr
-*.cnf
-*.log
+mysql/data/

@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="/style.css"/>
   <title>Home Page</title>
 </head>
-<body >
+<body style="background: green">
 
   <!-- Navigation -->
   <div class="container-fluid bg-light py-2">
@@ -56,13 +56,13 @@
     <h1 >WELCOME TO NOTETATION, <?= $_SESSION['username'] ?></h1>
   </div>
 
-  <!-- Create and Search -->
+  <!-- Create + Search -->
   <div class="container mb-4">
     <div class="row align-items-center">
       <div class="col-12 col-md-3 mb-2">
         <button class="btn btn-warning w-100" id="create">Create Note</button>
       </div>
-      <div class="col-12 col-md-9">
+      <div class="col-12 col-md-7">
         <form action="" method="get">
           <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
@@ -71,6 +71,16 @@
             </div>
           </div>
         </form>
+      </div>
+      <div class="col-12 col-md-2 mb-2">
+        <div class="btn-group w-100">
+          <button class="btn btn-outline-primary active" id="grid-view">
+            <i class="fas fa-th-large"></i>
+          </button>
+          <button class="btn btn-outline-primary" id="list-view">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -89,34 +99,32 @@
 
   <!-- Note Display -->
   <div class="container">
-    <div class="row d-flex ">
+    <div class="row" id="notes-container">
       <?php 
 	  	$sql="select * from user,note";
 	 
 	 	for ($i = 0; $i < 50; $i++) { ?>
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-  <div class="border rounded p-3 shadow-sm h-100 bg-white">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+          <div class="border rounded p-3 shadow-sm h-100 bg-white">
+            <!-- Title & 3-dot menu -->
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="font-weight-bold text-truncate" style="max-width: 85%;">Title <?= $i ?></div>
 
-    <!-- Title & 3-dot menu -->
-    <div class="d-flex justify-content-between align-items-start">
-      <div class="font-weight-bold text-truncate" style="max-width: 85%;">Title <?= $i ?></div>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+                  <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="#">Modify</a>
+                  <a class="dropdown-item text-danger" href="#">Delete</a>
+                </div>
+              </div>
+            </div>
 
-      <div class="dropdown">
-        <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
-          <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="#">Modify</a>
-          <a class="dropdown-item text-danger" href="#">Delete</a>
+            <!-- Note content -->
+            <div class="text-muted text-truncate mt-2">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Note content -->
-    <div class="text-muted text-truncate mt-2">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
-  </div>
-</div>
-
       <?php } ?>
     </div>
   </div>
