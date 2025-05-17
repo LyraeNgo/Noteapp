@@ -45,7 +45,10 @@
 
 
     if($row['is_activated']===0){?>
-      <div class=" m-3 p-3 alert alert-warning w-25 float-right" > Please activate your account using the email sent to you.</div>
+      <div class="alert alert-warning position-fixed top-0 end-0 m-3 p-3 w-25" style="z-index: 1055;">
+  Please activate your account using the email sent to you.
+</div>
+
     <?php }
   ?>
   <!-- Header -->
@@ -90,7 +93,7 @@
       <?php 
 	  	$sql="select * from user,note";
 	 
-	 	for ($i = 0; $i < 10; $i++) { ?>
+	 	for ($i = 0; $i < 50; $i++) { ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
   <div class="border rounded p-3 shadow-sm h-100 bg-white">
 
