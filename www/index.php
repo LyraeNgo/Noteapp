@@ -105,26 +105,27 @@
 	 
 	 	for ($i = 0; $i < 50; $i++) { ?>
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
-          <div class="border rounded p-3 shadow-sm h-100 bg-white">
-            <!-- Title & 3-dot menu -->
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="font-weight-bold text-truncate" style="max-width: 85%;">Title <?= $i ?></div>
+  <div class="border rounded p-3 shadow-sm h-100 bg-white">
+    <!-- Title -->
+    <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">Title <?= $i ?></div>
 
-              <div class="dropdown">
-                <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
-                  <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="#">Modify</a>
-                  <a class="dropdown-item text-danger" href="#">Delete</a>
-                </div>
-              </div>
-            </div>
+    <!-- Content + kebab menu -->
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="text-muted text-truncate">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
 
-            <!-- Note content -->
-            <div class="text-muted text-truncate mt-2">hehehhe, dhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh <?= $i ?></div>
-          </div>
+      <div class="dropdown ml-2">
+        <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+          <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="#">Modify</a>
+          <a class="dropdown-item text-danger" href="#">Delete</a>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       <?php } ?>
     </div>
   </div>
