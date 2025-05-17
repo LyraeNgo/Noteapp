@@ -7,7 +7,7 @@
     $user = 'root';
     $pass = 'root';
     $db = 'noteapp'; // tên databse
-	if($_SESSION['username']!='admin'){
+	if($_SESSION['username']!='minhtam'){
 		
 		echo "<script>alert('You do not have permission to access this page!'); window.location.href='/index.php';</script>";
 		die();

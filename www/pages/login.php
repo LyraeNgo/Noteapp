@@ -27,7 +27,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
         if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
-
+            
             // Now verify the password
             if (password_verify($pass, $row['password'])) {
                 $_SESSION['username'] = $row['display_name'];
