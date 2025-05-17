@@ -7,6 +7,13 @@
   }
 
   $conn=create_connection();
+  $theme = $_SESSION['theme'] ?? 'light';
+  $fontSize = $_SESSION['fontSize'] ?? 'medium';
+  $noteColor = $_SESSION['noteColor'] ?? '#ffffff';
+
+// Map font size
+  $fontMap = ['small' => '14px', 'medium' => '16px', 'large' => '20px'];
+  $fontSizePx = $fontMap[$fontSize] ?? '16px';
 
 ?>
 
@@ -24,18 +31,39 @@
   <link rel="stylesheet" href="/style.css"/>
   <title>Home Page</title>
 </head>
-<body style="background: green">
+<body class="<?= $theme === 'dark' ? 'dark-mode' : '' ?>" style="font-size: <?= $fontSizePx ?>;">
 
   <!-- Navigation -->
   <div class="container-fluid bg-light py-2">
-    <div class="d-flex justify-content-between align-items-center flex-wrap">
-      <a class="btn btn-outline-primary m-2" href="/pages/logout.php">Signout</a>
-
-      <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin') { ?>
+  <div class="d-flex justify-content-between align-items-center">
+    
+    <!-- Left Section -->
+    <div>
+      <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'minhtam') { ?>
         <a href="/admin/db.php" class="btn btn-primary m-2">Go to Admin Page</a>
       <?php } ?>
     </div>
+
+    <!-- Right Section -->
+    <div class="ml-auto">
+      <?php if (!empty($_SESSION['username'])): ?>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="profileMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <?= htmlspecialchars($_SESSION['username']) ?>
+            <i class="fa-solid fa-user"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenu">
+            <a class="dropdown-item" href="/pages/profile.php"> <i class="fa-solid fa-gear"></i> Profile Settings  </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="../pages/logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+
   </div>
+</div>
+
   <?php 
     $username=$_SESSION['username'];
     $sql='SELECT is_activated FROM user WHERE display_name=?';
@@ -65,9 +93,7 @@
       <div class="col-12 col-md-3 mb-2">
         <button type="button" class="btn btn-warning w-100" data-toggle="modal" data-target="#myModal">Create Note</button>
       </div>
-
-      
-      <div class="col-12 col-md-9">
+      <div class="col-12 col-md-7">
         <form action="" method="get">
             <div class="input-group">
               <input type="text" name="search" class="form-control" placeholder="Search notes..."/>

@@ -23,6 +23,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $stmt = $conn->prepare("SELECT id,display_name FROM user WHERE display_name = ? AND password = ?");
         $stmt->bind_param("ss", $user, $pass);
 
+        // Get user record by username
+        $stmt = $conn->prepare("SELECT * FROM user WHERE display_name = ?");
+        $stmt->bind_param("s", $user);
         $stmt->execute();
         $result = $stmt->get_result();  
         
@@ -35,6 +38,16 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             $_SESSION['username'] = $user;  
             header("Location: /index.php");
             exit(); 
+            $row = $result->fetch_assoc();
+            
+            // Now verify the password
+            if (password_verify($pass, $row['password'])) {
+                $_SESSION['username'] = $row['display_name'];
+                header("Location: /index.php");
+                exit(); 
+            } else {
+                $error = 'Incorrect username or password';
+            }
         } else {
             $error = 'Incorrect username or password';
         }
@@ -42,6 +55,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $stmt->close();
     }
 }
+
 
 $conn->close();
 ?>
@@ -75,7 +89,7 @@ $conn->close();
                             <input id="password" class="form-control" type="password" name="password" value="<?= $pass?>">
                         </div>
                         <div class="form-group ">
-                            <a href="#"><small>Fogot Password?</small></a>
+                            <a href="fogotpass.php"><small>Fogot Password?</small></a>
                         </div>
                         <div class="form-group loginform">
                             <?php
