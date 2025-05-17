@@ -32,7 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token=generateRandomString();
     if (empty($username) || empty($emailUser) || empty($password) || empty($confirm)) {
         $error = "Please enter username, email, and password.";
-    } elseif ($password !== $confirm) {
+    }else if(strlen($password)<6){
+        $error = "Password must greater than 6";
+    }
+     elseif ($password !== $confirm) {
         $error = "Confirm password does not match.";
     } else {
         // Check if email or username already exists
