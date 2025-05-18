@@ -196,9 +196,42 @@ document.addEventListener("DOMContentLoaded", function () {
           data.forEach(note => {
             html += `
               <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
-                <div class="border rounded p-3 shadow-sm h-100 bg-white">
-                  <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">${escapeHtml(note.tieu_de)}</div>
-                  <div class="text-muted text-truncate" style="max-width: 100%;">${escapeHtml(note.noi_dung)}</div>
+                <div class="border rounded p-3 shadow-sm h-100" style="background-color: ${note.color || '#fff'};">
+                  <!-- Title + Pin -->
+                  <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
+                    <div class="text-truncate">
+                      ${escapeHtml(note.tieu_de)}
+                      ${note.is_pinned ? '<i class="fa-solid fa-thumbtack"></i>' : ''}
+                    </div>
+                  </div>
+
+                  <!-- Content + Kebab -->
+                  <div class="d-flex justify-content-between align-items-start">
+                    <!-- Note content -->
+                    <div class="text-muted text-truncate pr-2" style="max-width: 90%;">
+                      ${escapeHtml(note.noi_dung)}
+                    </div>
+
+                    <!-- Kebab dropdown -->
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="Note/pin_note.php?id=${note.id}">
+                          ${note.is_pinned ? 
+                            '<i class="fa-solid fa-circle-xmark"></i> Unpin' : 
+                            '<i class="fa-solid fa-thumbtack"></i> Pin'}
+                        </a>
+                        <a class="dropdown-item btn-edit-note" href="#" data-id="${note.id}">
+                          <i class="fa-solid fa-pen"></i> Modify
+                        </a>
+                        <a class="dropdown-item text-danger delete-note" href="#" data-note-id="${note.id}">
+                          <i class="fa-solid fa-trash-can"></i> Delete
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>`;
           });
