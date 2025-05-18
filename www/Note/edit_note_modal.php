@@ -42,11 +42,11 @@ if ($note_id) {
           <span id="file-name" style="color:red;"></span>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Save</button>
+          <button type="submit" class="btn btn-success" href = "">Save</button>
           <button type="button" class="btn btn-secondary" id="saveBtn" data-dismiss="modal">Close</button>
         </div>
       </div>
     </form>
 
   </div>
-</div>
+</div>s

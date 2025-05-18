@@ -186,3 +186,49 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+
+$(document).ready(function() {
+  $('.btn-edit-note').on('click', function(e) {
+    e.preventDefault();
+    const noteId = $(this).data('id');
+
+    $.get('Note/edit_note_modal.php?id=' + noteId, function(data) {
+      $('#editNoteModalContainer').html(data);
+      $('#editNoteModal').modal('show');
+    });
+  });
+});
+
+document.querySelectorAll('.pin_btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const noteId = btn.dataset.noteId;
+        
+        try {
+            const response = await fetch('pin_note.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `note_id=${noteId}`
+            });
+
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                // Update UI
+                const icon = btn.querySelector('i');
+                icon.classList.toggle('text-primary', result.pinned);
+                btn.innerHTML = `
+                    ${result.pinned ? 'Bỏ ghim' : 'Ghim'}
+                    <i class="fas fa-thumbtack ${result.pinned ? 'text-primary' : ''}"></i>
+                `;
+                
+                // Optionally reorder notes
+                location.reload(); // Hoặc cập nhật DOM động
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
