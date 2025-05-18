@@ -243,33 +243,20 @@
           <input type="hidden" name="note_id" value="<?= $_GET['id'] ?? '' ?>">
           <textarea name="content" placeholder="Content" id="content" style="width: 100%; height:150px"></textarea>
         </div>
-        <!-- 
-        <div class="modal-body">
-          <input type="file" name="image" id="imageInput" class="custom-file-input" accept="image/*">
-          <label for="imageInput" class="custom-file-label" style="padding:8px 12px;">Choose Image</label>
-          <br><br>
-          <span id="file-name" style="color:red;"></span>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Save</button>
-          <button type="button" class="btn btn-secondary" id="saveBtn" data-dismiss="modal">Close</button>
-        </div>
-        -->
         <h4 class="p-1 px-3">Label</h4>
         <?php
-$conn = create_connection();
-$user_id = $_SESSION['user_id'];
-$labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
-?>
+        $user_id = $_SESSION['user_id'];
+        $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
+        ?>
 
-<select name="label_ids" multiple class="form-control mb-3" id="noteForm">
-  <?php while($label = $labels->fetch_assoc()): ?>
-    <option value="<?= $label['id'] ?>"><?= htmlspecialchars($label['name']) ?></option>
-  <?php endwhile; ?>
-</select>
+        <select name="label_ids[]" multiple class="form-control mb-3">
+          <?php while($label = $labels->fetch_assoc()): ?>
+            <option value="<?= $label['id'] ?>"><?= htmlspecialchars($label['name']) ?></option>
+          <?php endwhile; ?>
+        </select>
       </div>
-    </form>
-
+      </form>
+          
   </div>
 </div>
 
