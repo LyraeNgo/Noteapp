@@ -96,7 +96,7 @@
       <div class="col-12 col-md-9">
         <form action="" method="get">
             <div class="input-group">
-              <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
+              <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">Find</button>
             </div>
