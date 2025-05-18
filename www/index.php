@@ -206,14 +206,9 @@
 
     <!-- Search Input -->
     <div class="col-md-6">
-      <form action="" method="get">
-        <div class="input-group">
-          <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
-          <div class="input-group-append">
-            <button type="submit" class="btn btn-primary">Find</button>
-          </div>
-        </div>
-      </form>
+      <div class="input-group">
+        <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
+      </div>
     </div>
 
     <!-- View Toggle Buttons -->
@@ -293,7 +288,6 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
                 WHERE user_id = ? 
                 ORDER BY 
                 is_pinned DESC, 
-                pinned_at DESC, 
                 updated_at DESC
       ";
       $stmt = $conn->prepare($sql);

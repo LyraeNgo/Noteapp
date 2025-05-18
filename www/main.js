@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       const query = searchInput.value.trim();
-      fetch('Note/search_notes.php?q=' + encodeURIComponent(query))
+      fetch('/Note/search_notes.php?q=' + encodeURIComponent(query))
         .then(response => response.json())
         .then(data => {
           if (data.error) {
