@@ -262,7 +262,7 @@ $user_id = $_SESSION['user_id'];
 $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
 ?>
 
-<select name="label_ids[]" multiple class="form-control mb-3">
+<select name="label_ids" multiple class="form-control mb-3">
   <?php while($label = $labels->fetch_assoc()): ?>
     <option value="<?= $label['id'] ?>"><?= htmlspecialchars($label['name']) ?></option>
   <?php endwhile; ?>
@@ -300,7 +300,16 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
       <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item" >
         
         <div class="border rounded p-3 shadow-sm h-100"style="background-color: <?= $noteColor?>;" >
-  <!-- label -->
+  
+  <!-- Title + Pin -->
+  <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
+    <div class="text-truncate">
+      <?= htmlspecialchars($note['tieu_de']) ?>
+      <?php if ($note['is_pinned']): ?>
+        <i class="fa-solid fa-thumbtack"></i>
+      <?php endif; ?>
+    </div>
+    <!-- label -->
    <div class="mb-2">
   <?php
     $labelStmt = $conn->prepare("
@@ -320,14 +329,6 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
   </span>
   <?php endwhile; ?>
 </div>
-  <!-- Title + Pin -->
-  <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
-    <div class="text-truncate">
-      <?= htmlspecialchars($note['tieu_de']) ?>
-      <?php if ($note['is_pinned']): ?>
-        <i class="fa-solid fa-thumbtack"></i>
-      <?php endif; ?>
-    </div>
   </div>
 
   <!-- Content + Kebab -->
