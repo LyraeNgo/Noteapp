@@ -130,6 +130,7 @@
         <!-- Add Label Form -->
         <form action="./Label/add_label.php" method="POST" class="mb-3 d-flex">
           <input type="text" name="label_name" class="form-control mr-2" placeholder="Label Name" required>
+          <input type="color" name="label_color" class="form-control form-control-color mr-2"  title="Choose color">
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
 
@@ -145,6 +146,7 @@
           <thead class="thead-light">
             <tr>
               <th>Label</th>
+              <th style="width: 100px;">Color</th>
               <th style="width: 80px;">Actions</th>
             </tr>
           </thead>
@@ -152,6 +154,12 @@
             <?php while ($label = $labelResult->fetch_assoc()): ?>
               <tr>
                 <td><?= htmlspecialchars($label['name']) ?></td>
+                <td>
+  <span class="badge" style="background-color: <?= htmlspecialchars($label['color']) ?>;">
+    <?= htmlspecialchars($label['name']) ?>
+  </span>
+</td>
+
                 <td>
                   <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editLabelModal<?= $label['id'] ?>">
   <i class="fa fa-edit"></i>
@@ -167,8 +175,10 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <input type="text" name="label_name" value="<?= htmlspecialchars($label['name']) ?>" class="form-control" required>
-      </div>
+  <input type="text" name="label_name" value="<?= htmlspecialchars($label['name']) ?>" class="form-control mb-2" required>
+  <input type="color" name="label_color" value="<?= htmlspecialchars($label['color']) ?>" class="form-control form-control-color" title="Choose color">
+</div>
+
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Save changes</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -250,6 +260,7 @@
           <button type="button" class="btn btn-secondary" id="saveBtn" data-dismiss="modal">Close</button>
         </div>
         -->
+        <h4 class="p-1 px-3">Label</h4>
         <?php
 $conn = create_connection();
 $user_id = $_SESSION['user_id'];
@@ -299,7 +310,7 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
    <div class="mb-2">
   <?php
     $labelStmt = $conn->prepare("
-      SELECT label.name 
+      SELECT label.name, label.color 
       FROM note_label 
       JOIN label ON note_label.label_id = label.id 
       WHERE note_label.note_id = ?
@@ -309,7 +320,10 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
     $labelResult = $labelStmt->get_result();
     while ($label = $labelResult->fetch_assoc()):
   ?>
-    <span class="badge badge-info"><?= htmlspecialchars($label['name']) ?></span>
+    
+    <span class="badge" style="background-color: <?= htmlspecialchars($label['color']) ?>;">
+    <?= htmlspecialchars($label['name']) ?>
+  </span>
   <?php endwhile; ?>
 </div>
   <!-- Title + Pin -->
