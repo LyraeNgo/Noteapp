@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once('../admin/db-con.php');
-
+if(!isset($_SESSION['username'])){
+    header('Location: ./pages/login.php');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = create_connection();
     

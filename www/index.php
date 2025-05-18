@@ -5,8 +5,8 @@
     header("Location: /pages/login.php");
     die();
   }
-  if (!isset($_SESSION["user_id"])) {
-    echo"ddaff";
+  if (isset($_SESSION["user_id"])) {
+    echo $_SESSION["user_id"];
   }
 
   $conn=create_connection();
