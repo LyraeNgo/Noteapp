@@ -77,28 +77,44 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-let lastSavedContent = '';
-const noteInput = document.querySelector('#noteForm textarea[name="content"]');
+let lastSavedState = '';
 
-noteInput.addEventListener('blur', () => {
-  const form = document.getElementById('noteForm');
+// Get form element
+const form = document.getElementById('noteForm');
+
+// Safely serialize current form data
+function getFormSnapshot(form) {
   const formData = new FormData(form);
-  const currentContent = formData.get('content');
+  return JSON.stringify(Array.from(formData.entries()));
+}
 
-  // Kiểm tra nếu nội dung đã thay đổi
-  if (currentContent !== lastSavedContent) {
-    fetch('Note/save_note.php', { method: 'POST', body: formData })
-      .then(() => {
-        lastSavedContent = currentContent;
-        console.log('Đã lưu note tự động');
-        // Hiển thị trạng thái lưu nếu muốn
-        location.reload();
-      })
-      .catch(err => {
-        console.error('Lỗi khi lưu note:', err);
-      });
+// Function to save the form if data changed
+function saveNoteIfChanged() {
+  const currentState = getFormSnapshot(form);
+
+  if (currentState !== lastSavedState) {
+    fetch('Note/save_note.php', {
+      method: 'POST',
+      body: new FormData(form)
+    })
+    .then(() => {
+      lastSavedState = currentState;
+      console.log('✅ Ghi chú đã được lưu khi đóng modal');
+    })
+    .catch(err => {
+      console.error('❌ Lỗi khi lưu ghi chú:', err);
+    });
+  }
+}
+
+// Attach event when Bootstrap modal is hidden
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('myModal');
+  if (modal) {
+    $(modal).on('hidden.bs.modal', saveNoteIfChanged);
   }
 });
+
 
 // Xử lý xóa ghi chú (làm lại từ đầu)
 $(document).off('click', '.delete-note'); // Xóa event cũ nếu có

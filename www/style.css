@@ -336,7 +336,7 @@ body.dark-mode {
   color: #e4e6eb !important;
 }
 body.dark-mode .note-item .border {
-  background: #23272f !important;
+  /* background: #23272f !important; */
   color: #e4e6eb !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.25), 0 1.5px 4px rgba(0,0,0,0.18);
 }
