@@ -126,68 +126,6 @@ $(document).on('click', '.delete-note', function(e) {
 });
 
 
-// search
-document.addEventListener("DOMContentLoaded", function () {
-  const searchInput = document.getElementById('searchInput');
-  const notesContainer = document.getElementById('notes-container');
-
-  let debounceTimeout;
-
-  searchInput.addEventListener('input', function () {
-    clearTimeout(debounceTimeout);
-
-    debounceTimeout = setTimeout(() => {
-      const query = searchInput.value.trim();
-
-      fetch(`www/Note/search_notes.php?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            notesContainer.innerHTML = '<p>Error: ' + data.error + '</p>';
-            return;
-          }
-
-          if (data.length === 0) {
-            notesContainer.innerHTML = '<p>No matching notes found.</p>';
-            return;
-          }
-
-          // Build HTML from notes
-          let html = '';
-          data.forEach(note => {
-            html += `
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
-                <div class="border rounded p-3 shadow-sm h-100 bg-white">
-                  <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">${escapeHtml(note.tieu_de)}</div>
-                  <div class="text-muted text-truncate" style="max-width: 100%;">${escapeHtml(note.noi_dung)}</div>
-                </div>
-              </div>`;
-          });
-
-          notesContainer.innerHTML = html;
-        })
-        .catch(err => {
-          notesContainer.innerHTML = '<p>Error fetching notes.</p>';
-          console.error(err);
-        });
-    }, 300); // debounce 300ms
-  });
-
-  // Helper to escape HTML special chars
-  function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, function(m) {
-      return {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      }[m];
-    });
-  }
-});
-
-
 $(document).ready(function() {
   $('.btn-edit-note').on('click', function(e) {
     e.preventDefault();
@@ -231,4 +169,57 @@ document.querySelectorAll('.pin_btn').forEach(btn => {
             console.error('Error:', error);
         }
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById('searchInput');
+  const notesContainer = document.getElementById('notes-container');
+  if (!searchInput || !notesContainer) return;
+  let debounceTimeout;
+
+  searchInput.addEventListener('input', function () {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      const query = searchInput.value.trim();
+      fetch('Note/search_notes.php?q=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            notesContainer.innerHTML = '<p class="text-danger">' + escapeHtml(data.error) + '</p>';
+            return;
+          }
+          if (data.length === 0) {
+            notesContainer.innerHTML = '<p>No matching notes found.</p>';
+            return;
+          }
+          let html = '';
+          data.forEach(note => {
+            html += `
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+                <div class="border rounded p-3 shadow-sm h-100 bg-white">
+                  <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">${escapeHtml(note.tieu_de)}</div>
+                  <div class="text-muted text-truncate" style="max-width: 100%;">${escapeHtml(note.noi_dung)}</div>
+                </div>
+              </div>`;
+          });
+          notesContainer.innerHTML = html;
+        })
+        .catch(err => {
+          notesContainer.innerHTML = '<p class="text-danger">Error fetching notes.</p>';
+          console.error(err);
+        });
+    }, 300);
+  });
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, function(m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
+    });
+  }
 });
