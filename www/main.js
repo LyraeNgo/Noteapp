@@ -97,6 +97,34 @@ noteInput.addEventListener('blur', () => {
   }
 });
 
+// Xử lý xóa ghi chú
+$(document).on('click', '.delete-note', function(e) {
+    e.preventDefault();
+    const noteId = $(this).data('note-id');
+    
+    if (confirm('Are you sure you want to delete this note?')) {
+        $.ajax({
+            url: '/Note/delete_note.php',
+            method: 'POST',
+            data: { note_id: noteId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Xóa ghi chú khỏi giao diện
+                    $(`[data-note-id="${noteId}"]`).closest('.note-item').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                } else {
+                    alert(response.message || 'Failed to delete note');
+                }
+            },
+            error: function() {
+                alert('An error occurred while deleting the note');
+            }
+        });
+    }
+});
+
 
 // search
 document.addEventListener("DOMContentLoaded", function () {

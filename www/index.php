@@ -156,7 +156,7 @@
     $user_id = $_SESSION['user_id'] ?? null;
 
     if ($user_id) {
-        $stmt = $conn->prepare("SELECT tieu_de, noi_dung FROM note WHERE user_id = ?");
+        $stmt = $conn->prepare("SELECT id, tieu_de, noi_dung FROM note WHERE user_id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -182,13 +182,13 @@
                 <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
               </button>
               <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="Note/Edit_note.php">Modify</a>
-                <a class="dropdown-item text-danger" href="">Delete</a>
+                <a class="dropdown-item" href="Note/Edit_note.php?id=<?= $note['id'] ?>">Modify</a>
+                <a class="dropdown-item text-danger delete-note" href="#" data-note-id="<?= $note['id'] ?>">Delete</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-      </div>
-        </div>
           <?php
               endwhile;
               $stmt->close();
