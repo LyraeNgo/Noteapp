@@ -20,6 +20,9 @@
 
 ?>
 
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,12 +99,13 @@
       <div class="col-12 col-md-9">
         <form action="" method="get">
             <div class="input-group">
-              <input type="text" name="search" class="form-control" placeholder="Search notes..."/>
+              <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">Find</button>
             </div>
           </div>
         </form>
+
       </div>
     
       <div class="col-12 col-md-2 mb-2">
@@ -109,11 +113,12 @@
           <button class="btn btn-outline-primary active" id="grid-view"  >
             <i class="fas fa-th-large"></i>
           </button>
-          <button class="btn btn-outline-primary" id="list-view" >
+          <button class="btn btn-outline-primary" id="list-view">
             <i class="fas fa-list"></i>
           </button>
         </div>
       </div>
+      
     </div>
   </div>
   <!-- Note Form by TaPu-->
@@ -147,28 +152,40 @@
   </div>
 </div>
 
-  <!-- Note Display -->
+<!-- Note Display -->
   <div class="container">
-  <div id="notes-container" class="row ">
+  <div id="notesContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    
     <?php
     require_once('admin/db-con.php');
     $conn = create_connection();
     $user_id = $_SESSION['user_id'] ?? null;
-
+      
     if ($user_id) {
-        $stmt = $conn->prepare("SELECT id, tieu_de, noi_dung FROM note WHERE user_id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+              $sql = "
+                SELECT * FROM note 
+                WHERE user_id = ? 
+                ORDER BY 
+                is_pinned DESC, 
+                pinned_at DESC, 
+                updated_at DESC
+      ";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("i", $_SESSION['user_id']);
+      $stmt->execute();
+      $result = $stmt->get_result();
 
         while ($note = $result->fetch_assoc()):
     ?>
       <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+        
         <div class="border rounded p-3 shadow-sm h-100 bg-white">
-
+          
           <!-- Title -->
           <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">
             <?= htmlspecialchars($note['tieu_de']) ?>
+            <?php if ($note['is_pinned']): ?>📌<?php endif; ?>
+            
           </div>
 
           <!-- Content + kebab menu -->
@@ -177,15 +194,17 @@
               <?= htmlspecialchars($note['noi_dung']) ?>
             </div>
 
-            <div class="dropdown ml-2">
-              <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
-                <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
-              </button>
+              <div class="dropdown ml-2">
+                <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+                  <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+                </button>
               <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="Note/Edit_note.php?id=<?= $note['id'] ?>">Modify</a>
-                <a class="dropdown-item text-danger delete-note" href="#" data-note-id="<?= $note['id'] ?>">Delete</a>
+                <a class="dropdown-item" href="Note/pin_note.php?id=<?= $note['id'] ?>" >Pinned</a>
+                <a class="dropdown-item btn-edit-note" href="#" data-id="<?= $note['id'] ?>">Modify</a>
+                <a class="dropdown-item text-danger" href="">Delete</a>
               </div>
             </div>
+            <div id="editNoteModalContainer"></div>
           </div>
         </div>
       </div>
@@ -193,20 +212,24 @@
               endwhile;
               $stmt->close();
           } else {
-              echo '<p class="">Vui lòng đăng nhập để xem ghi chú.</p>';
+              echo '<p class="text-white">Vui lòng đăng nhập để xem ghi chú.</p>';
           }
 
           $conn->close();
         ?>
+
+        
+        
         </div>
       </div>
     </div>
   </div>
-
+          
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/main.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </body>
 </html>

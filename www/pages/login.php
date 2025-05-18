@@ -11,7 +11,7 @@ $pass= "";
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $user = trim($_POST['username']);
     $pass = trim($_POST['password']);
-
+    
     if (empty($user) && empty($pass)) {
         $error = 'Please enter Username and Password';
     } elseif (empty($user)) {
@@ -19,13 +19,25 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     } elseif (empty($pass)) {
         $error = 'Please enter your password';
     } else {
+        // Prepare and bind AFTER getting the values
+        $stmt = $conn->prepare("SELECT id,display_name FROM user WHERE display_name = ? AND password = ?");
+        $stmt->bind_param("ss", $user, $pass);
+
         // Get user record by username
         $stmt = $conn->prepare("SELECT * FROM user WHERE display_name = ?");
         $stmt->bind_param("s", $user);
         $stmt->execute();
         $result = $stmt->get_result();  
-
+        
+        // Check if a user is found
         if ($result->num_rows === 1) {
+            $user_data = $result->fetch_assoc();
+            
+            $_SESSION['user_id'] = $user_data['id'];
+            $_SESSION['display_name'] = $user_data['display_name'];
+            $_SESSION['username'] = $user;  
+            header("Location: /index.php");
+            exit(); 
             $row = $result->fetch_assoc();
             
             // Now verify the password
