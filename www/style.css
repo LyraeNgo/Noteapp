@@ -1,0 +1,172 @@
+.loginform{
+	margin-bottom: 5%;
+}
+*{
+	box-sizing: border-box;
+	
+}
+
+.index-nav{
+	display: flex;
+	flex-direction: row;
+}
+
+.header{
+	display: flex;
+	justify-content: center;
+
+}
+.title{
+	border: none;
+	font-size: larger;
+	width: 100%;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+.contents{
+	width: 100%;
+}
+.noteblock{
+	background-color: green;
+	border: solid black 1px;
+}
+
+/* View mode styles */
+/* LIST VIEW CONTAINER */
+#notes-container.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+}
+
+/* NOTE ITEM */
+#notes-container.list-view .note-item {
+  width: 100%;
+  max-width: 80%;
+  margin: 0 auto
+
+}
+
+/* NOTE CARD STYLE */
+#notes-container.list-view .note-item .border {
+  background-color: #f8f9fa;
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ROW 1: Title + Kebab */
+#notes-container.list-view .note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* TITLE */
+#notes-container.list-view .note-item .font-weight-bold {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0;
+}
+
+/* KEBAB MENU */
+#notes-container.list-view .note-item .dropdown button {
+  background: none;
+  border: none;
+  color: #6c757d;
+  padding: 0;
+}
+
+#notes-container.list-view .note-item .dropdown-menu {
+  min-width: 120px;
+}
+
+/* ROW 2: Content */
+#notes-container.list-view .note-item .text-muted {
+  font-size: 1rem;
+  color: #495057;
+  white-space: pre-line;
+  line-height: 1.5;
+  margin: 0;
+}
+
+
+
+/* pre */
+
+.dark-mode {        
+  background-color: #1a1919;
+  color: #ffffff;
+}
+
+.dark-mode .note-preview {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+
+body.dark-mode select,
+body.dark-mode input[type="color"],
+body.dark-mode .form-control {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}

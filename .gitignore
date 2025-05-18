@@ -1,0 +1,36 @@
+# IDE files
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.local
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# XAMPP specific
+/xampp/
+/xamppfiles/
+
+# Ignore database files
+mysql/data/
+*.sock
+
+# Ignore IDE files
+*.sublime-*
+
+# Ignore OS generated files
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
