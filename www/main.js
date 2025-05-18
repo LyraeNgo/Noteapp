@@ -122,9 +122,9 @@ $(document).on('click', '.delete-note', function(e) {
                     $(`[data-note-id="${noteId}"]`).closest('.note-item').fadeOut(300, function() {
                         $(this).remove();
                     });
-                    alert('Note deleted successfully!');
+                    showToast('Note deleted successfully!', 'success');
                 } else {
-                    alert(response.message || 'Failed to delete note');
+                    showToast(response.message || 'Failed to delete note', 'error');
                 }
             },
             error: function(xhr) {
@@ -135,7 +135,7 @@ $(document).on('click', '.delete-note', function(e) {
                         msg = res.message || msg;
                     } catch(e) {}
                 }
-                alert(msg);
+                showToast(msg, 'error');
             }
         });
     }
@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
           data.forEach(note => {
             html += `
               <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
-                <div class="border rounded p-3 shadow-sm h-100" style="background-color: ${note.color || '#fff'};">
+                <div class="border rounded p-3 shadow-sm h-100" style="background-color: ${note.color || (window.userPreference && window.userPreference.noteColor) || '#fff'}; font-size: ${(window.userPreference && window.userPreference.fontSize) || '16px'};">
                   <!-- Title + Pin -->
                   <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
                     <div class="text-truncate">
@@ -250,6 +250,12 @@ document.addEventListener("DOMContentLoaded", function () {
               </div>`;
           });
           notesContainer.innerHTML = html;
+          // Áp dụng lại dark mode nếu cần
+          if (window.userPreference && window.userPreference.theme === 'dark') {
+            document.body.classList.add('dark-mode');
+          } else {
+            document.body.classList.remove('dark-mode');
+          }
         })
         .catch(err => {
           notesContainer.innerHTML = '<p class="text-danger">Error fetching notes.</p>';
@@ -288,12 +294,51 @@ $(document).on('click', '.pin-note', function(e) {
           icon.toggleClass('text-primary');
           $(this).text(response.pinned ? 'Unpin' : 'Pin');
         } else {
-          alert(response.message || 'Failed to pin note');
+          showToast(response.message || 'Failed to pin note', 'error');
         }
       },
       error: function() {
-        alert('An error occurred while pinning the note');
+        showToast('An error occurred while pinning the note', 'error');
       }
     });
+  }
+});
+
+function showToast(message, type = 'success') {
+  const toastId = 'toast-' + Date.now();
+  const bg = type === 'success' ? 'bg-success' : (type === 'error' ? 'bg-danger' : 'bg-info');
+  const html = `
+    <div id="${toastId}" class="toast ${bg} text-white" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500" style="min-width: 250px;">
+      <div class="toast-body d-flex justify-content-between align-items-center">
+        <span>${message}</span>
+        <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast" aria-label="Close" style="background: none; border: none; font-size: 1.2rem;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>`;
+  $('#toast-container').append(html);
+  const $toast = $('#' + toastId);
+  $toast.toast({ delay: 2500 });
+  $toast.toast('show');
+  $toast.on('hidden.bs.toast', function () {
+    $toast.remove();
+  });
+}
+
+// Tự động focus vào ô tiêu đề khi mở modal tạo note
+$(document).ready(function() {
+  $('#myModal').on('shown.bs.modal', function () {
+    $('#title').trigger('focus');
+  });
+});
+// Tự động focus vào ô tiêu đề khi mở modal sửa note
+$(document).on('shown.bs.modal', '#editNoteModal', function () {
+  $('#editNoteModal').find('#title').trigger('focus');
+});
+// Cho phép nhấn Enter để submit form khi đang ở ô tiêu đề hoặc nội dung
+$(document).on('keydown', '#title, #content', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    $(this).closest('form').submit();
   }
 });
