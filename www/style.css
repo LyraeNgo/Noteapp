@@ -259,3 +259,136 @@ input:checked + .slider:before {
 .modal-body form {
   width: 100%;
 }
+
+/* Card note UI improvements */
+.note-item .border {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1.5px 4px rgba(0,0,0,0.04);
+  padding: 1.2rem !important;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+.note-item .border:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.08);
+}
+.note-item .font-weight-bold {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  font-size: 1.1rem;
+}
+.note-item .text-muted {
+  font-size: 1rem;
+  color: #555 !important;
+}
+
+/* Kebab menu button */
+.note-item .dropdown .btn-light {
+  border-radius: 50%;
+  padding: 0.3rem 0.5rem;
+}
+
+/* Responsive grid */
+@media (max-width: 768px) {
+  #notes-container .note-item {
+    margin-bottom: 1.2rem;
+  }
+}
+
+/* Input, button UI */
+input.form-control, .btn {
+  border-radius: 8px !important;
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+.btn-warning {
+  background: #ffc107;
+  border: none;
+  color: #222;
+  font-weight: 600;
+}
+.btn-warning:hover {
+  background: #ffb300;
+}
+
+/* Toast UI */
+#toast-container .toast {
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  font-size: 1rem;
+}
+.bg-success { background: #28a745 !important; }
+.bg-danger { background: #dc3545 !important; }
+.bg-info { background: #17a2b8 !important; }
+
+/* Modal UI */
+.modal-content {
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+}
+
+/* Misc */
+body {
+  background: #f7f8fa;
+}
+
+/* Dark mode improvements */
+body.dark-mode {
+  background-color: #18191a !important;
+  color: #e4e6eb !important;
+}
+body.dark-mode .note-item .border {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), 0 1.5px 4px rgba(0,0,0,0.18);
+}
+body.dark-mode .note-item .font-weight-bold,
+body.dark-mode .note-item .text-muted {
+  color: #e4e6eb !important;
+}
+body.dark-mode .note-item .dropdown .btn-light {
+  background: #2c2f34 !important;
+  color: #e4e6eb !important;
+}
+body.dark-mode .dropdown-menu {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  border: 1px solid #444;
+}
+body.dark-mode .dropdown-item {
+  color: #e4e6eb !important;
+}
+body.dark-mode .dropdown-item:hover {
+  background: #33374a !important;
+  color: #fff !important;
+}
+body.dark-mode input.form-control,
+body.dark-mode .form-control,
+body.dark-mode textarea {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  border: 1px solid #444;
+}
+body.dark-mode .btn,
+body.dark-mode .btn-warning {
+  background: #33374a !important;
+  color: #e4e6eb !important;
+  border: none;
+}
+body.dark-mode .btn-warning:hover {
+  background: #44496a !important;
+}
+body.dark-mode #toast-container .toast {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  border: 1px solid #444;
+}
+body.dark-mode .modal-content {
+  background: #23272f !important;
+  color: #e4e6eb !important;
+  border: 1px solid #444;
+}
+body.dark-mode .fa-solid,
+body.dark-mode .fa-pen,
+body.dark-mode .fa-trash-can,
+body.dark-mode .fa-thumbtack {
+  color: #e4e6eb !important;
+}

@@ -397,5 +397,16 @@ $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/main.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Toast Notification -->
+  <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; min-width: 250px; z-index: 9999;">
+    <div id="toast-container"></div>
+  </div>
+  <script>
+    window.userPreference = {
+      noteColor: '<?= $noteColor ?>',
+      fontSize: '<?= $fontSizePx ?>',
+      theme: '<?= $theme ?>'
+    };
+  </script>
 </body>
 </html>
