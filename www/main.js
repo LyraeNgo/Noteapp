@@ -232,3 +232,36 @@ document.querySelectorAll('.pin_btn').forEach(btn => {
         }
     });
 });
+
+
+//display image 
+ 
+  //xóa 
+  document.querySelectorAll('.delete-image-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const imgPath = this.getAttribute('data-img');
+    const noteId = document.querySelector('input[name="note_id"]').value;
+
+    if (confirm("Are you sure you want to delete this image?")) {
+      fetch('Note/delete_image.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `img=${encodeURIComponent(imgPath)}&note_id=${encodeURIComponent(noteId)}`
+      })
+      .then(res => res.text())
+      .then(data => {
+        if (data === 'success') {
+          this.closest('.mb-2').remove();  // Remove image div
+        } else {
+          alert('Failed to delete image.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error occurred.');
+      });
+    }
+  });
+});

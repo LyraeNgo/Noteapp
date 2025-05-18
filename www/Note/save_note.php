@@ -41,12 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // ADD new image
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/uploads/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $filename = uniqid() . '_' . basename($_FILES['image']['name']);
+        if (!empty($_FILES['images']['name'][0])) {
+    $uploadDir = __DIR__ . '/uploads/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+        if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
+            $filename = uniqid() . '_' . basename($_FILES['images']['name'][$key]);
             $target_path = $uploadDir . $filename;
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+
+            if (move_uploaded_file($tmp_name, $target_path)) {
                 $path = 'uploads/' . $filename;
                 $stmt = $conn->prepare("INSERT INTO note_image (note_id, path) VALUES (?, ?)");
                 $stmt->bind_param("is", $note_id, $path);
@@ -54,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->close();
             }
         }
+    }
+}
 
         // LABELS
         $stmt = $conn->prepare("DELETE FROM note_label WHERE note_id = ?");
@@ -72,8 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $conn->commit();
         $_SESSION['success'] = $note_id ? "Success modify" : "Success create";
+
+
+
+
+
+        
         header("Location: /index.php");
         exit();
+
     } catch (Exception $e) {
         $conn->rollback();
         die("Lỗi xử lý: " . $e->getMessage());
