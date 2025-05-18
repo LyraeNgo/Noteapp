@@ -16,11 +16,11 @@ if (isset($_GET['id'])) {
     if ($note) {
         if ($note['is_pinned']) {
             
-            $stmt = $conn->prepare("UPDATE note SET is_pinned = 0, pinned_at = NULL WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE note SET is_pinned = 0 WHERE id = ?");
             $stmt->bind_param("i", $note_id);
         } else {
             
-            $stmt = $conn->prepare("UPDATE note SET is_pinned = 1, pinned_at = NOW() WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE note SET is_pinned = 1 WHERE id = ?");
             $stmt->bind_param("i", $note_id);
         }
         $stmt->execute();

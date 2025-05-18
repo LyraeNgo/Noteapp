@@ -216,7 +216,9 @@
 
 
         <a class="dropdown-item btn-edit-note" href="#" data-id="<?= $note['id'] ?>"><i class="fa-solid fa-pen"></i> Modify</a>
-        <a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-trash-can"></i> Delete</a>
+        <a class="dropdown-item text-danger delete-note" href="#" data-note-id="<?= $note['id'] ?>">
+          <i class="fa-solid fa-trash-can"></i> Delete
+        </a>
       </div>
     </div>
   </div>
