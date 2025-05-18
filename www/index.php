@@ -39,7 +39,8 @@
   <!-- Navigation -->
   <div class="container-fluid bg-light py-2">
   <div class="d-flex justify-content-between align-items-center">
-    
+  
+
     <!-- Left Section -->
     <div>
       <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'minhtam') { ?>
@@ -85,6 +86,21 @@
 
     <?php }
   ?>
+<?php if (isset($_SESSION['label_message'])): ?>
+  <div class="container mt-3" >
+    <div class="alert alert-<?= $_SESSION['label_message']['type'] ?> alert-dismissible fade show"
+         style="position: fixed; top: 20px; right: 20px; z-index: 1055; width: 500px;" role="alert">
+      <?= htmlspecialchars($_SESSION['label_message']['text']) ?>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <?php unset($_SESSION['label_message']); ?>
+<?php endif; ?>
+
+
+
   <!-- Header -->
   <div class="container text-center my-4 bg-dark text-white">
     <h1 >WELCOME TO NOTETATION, <?= $_SESSION['username'] ?></h1>
@@ -94,9 +110,87 @@
   <div class="row align-items-center">
 
     <!-- Create Note Button -->
-    <div class="col-md-3 ">
-      <button type="button" id="create" class="btn btn-warning w-100" data-toggle="modal" data-target="#myModal">
-        Create Note
+    <div class="col-md-3 d-flex p-1 ">
+            <!-- Create Label Modal -->
+<button class="btn btn-secondary m-1 p-1 w-50" data-toggle="modal" data-target="#labelModal"> Labels</button>
+
+<!-- Create Label Modal -->
+<div class="modal fade" id="labelModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Labels</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Add Label Form -->
+        <form action="./Label/add_label.php" method="POST" class="mb-3 d-flex">
+          <input type="text" name="label_name" class="form-control mr-2" placeholder="Label Name" required>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+
+        <!-- Label Table -->
+        <?php
+          $conn = create_connection();
+          $user_id = $_SESSION['user_id'];
+          $labelResult = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
+        ?>
+
+        <?php if ($labelResult->num_rows > 0): ?>
+        <table class="table table-bordered table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th>Label</th>
+              <th style="width: 80px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php while ($label = $labelResult->fetch_assoc()): ?>
+              <tr>
+                <td><?= htmlspecialchars($label['name']) ?></td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editLabelModal<?= $label['id'] ?>">
+  <i class="fa fa-edit"></i>
+</button>
+                  <a href="./Label/delete_label.php?id=<?= $label['id'] ?>" class="btn btn-sm btn-danger btn-delete" onclick="return confirm('Delete this label?');"><i class="fa fa-trash"></i></a>
+
+                  <div class="modal fade" id="editLabelModal<?= $label['id'] ?>" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" action="./Label/edit_label.php" class="modal-content">
+      <input type="hidden" name="label_id" value="<?= $label['id'] ?>">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Label</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" name="label_name" value="<?= htmlspecialchars($label['name']) ?>" class="form-control" required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
+        <?php else: ?>
+          <p class="text-muted">No labels yet.</p>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <button type="button" id="create" class="btn btn-warning w-50 m-1" data-toggle="modal" data-target="#myModal">
+        Create 
       </button>
     </div>
 
@@ -124,6 +218,9 @@
       </div>
     </div>
 
+  </div>
+  <div class="row">
+    
   </div>
 </div>
 
@@ -153,6 +250,17 @@
           <button type="button" class="btn btn-secondary" id="saveBtn" data-dismiss="modal">Close</button>
         </div>
         -->
+        <?php
+$conn = create_connection();
+$user_id = $_SESSION['user_id'];
+$labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
+?>
+
+<select name="label_ids[]" multiple class="form-control mb-3">
+  <?php while($label = $labels->fetch_assoc()): ?>
+    <option value="<?= $label['id'] ?>"><?= htmlspecialchars($label['name']) ?></option>
+  <?php endwhile; ?>
+</select>
       </div>
     </form>
 
@@ -187,7 +295,23 @@
       <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item" >
         
         <div class="border rounded p-3 shadow-sm h-100"style="background-color: <?= $noteColor?>;" >
-
+  <!-- label -->
+   <div class="mb-2">
+  <?php
+    $labelStmt = $conn->prepare("
+      SELECT label.name 
+      FROM note_label 
+      JOIN label ON note_label.label_id = label.id 
+      WHERE note_label.note_id = ?
+    ");
+    $labelStmt->bind_param("i", $note['id']);
+    $labelStmt->execute();
+    $labelResult = $labelStmt->get_result();
+    while ($label = $labelResult->fetch_assoc()):
+  ?>
+    <span class="badge badge-info"><?= htmlspecialchars($label['name']) ?></span>
+  <?php endwhile; ?>
+</div>
   <!-- Title + Pin -->
   <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
     <div class="text-truncate">
@@ -205,7 +329,8 @@
     <div class="text-muted text-truncate pr-2" style="max-width: 90%;">
       <?= htmlspecialchars($note['noi_dung']) ?>
     </div>
-
+      
+    
     <!-- Kebab dropdown -->
     <div class="dropdown">
       <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
@@ -218,7 +343,14 @@
   <?php else: ?>
     <i class="fa-solid fa-thumbtack"></i> Pin
   <?php endif; ?>
-</a>
+</a>  
+
+
+<div>
+  <?php while ($label = $labelResult->fetch_assoc()): ?>
+    <span class="badge badge-info"><?= htmlspecialchars($label['name']) ?></span>
+  <?php endwhile; ?>
+</div>
 
 
         <a class="dropdown-item btn-edit-note" href="#" data-id="<?= $note['id'] ?>"><i class="fa-solid fa-pen"></i> Modify</a>

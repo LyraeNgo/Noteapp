@@ -4,18 +4,18 @@ require_once('../admin/db-con.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = create_connection();
-
     $user_id = $_SESSION['user_id'];
+
     $note_id = $_POST['note_id'] ?? null;
     $title = $_POST['title'] ?? '';
     $content = $_POST['content'] ?? '';
-    $label_ids = $_POST['labels'] ?? [];
+    $label_ids = $_POST['label_ids'] ?? []; // Corrected name
     $delete_images = $_POST['delete_images'] ?? [];
 
     try {
         $conn->begin_transaction();
 
-        // INSERT or UPDATE NOTE
+        // Create or update the note
         if ($note_id) {
             $stmt = $conn->prepare("UPDATE note SET tieu_de = ?, noi_dung = ?, updated_at = NOW() WHERE id = ? AND user_id = ?");
             $stmt->bind_param("ssii", $title, $content, $note_id, $user_id);
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
-        // DELETE selected images
+        // Delete selected images
         if (!empty($delete_images)) {
             foreach ($delete_images as $img_id) {
                 $stmt = $conn->prepare("DELETE FROM note_image WHERE id = ? AND note_id = ?");
@@ -40,12 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // ADD new image
+        // Upload new image if available
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/uploads/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
             $filename = uniqid() . '_' . basename($_FILES['image']['name']);
             $target_path = $uploadDir . $filename;
+
             if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
                 $path = 'uploads/' . $filename;
                 $stmt = $conn->prepare("INSERT INTO note_image (note_id, path) VALUES (?, ?)");
@@ -55,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // LABELS
+        // Manage note labels
         $stmt = $conn->prepare("DELETE FROM note_label WHERE note_id = ?");
         $stmt->bind_param("i", $note_id);
         $stmt->execute();
@@ -71,15 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
-        $_SESSION['success'] = $note_id ? "Success modify" : "Success create";
+        $_SESSION['success'] = $note_id ? "Note updated successfully." : "Note created successfully.";
         header("Location: /index.php");
         exit();
+
     } catch (Exception $e) {
         $conn->rollback();
-        die("Lỗi xử lý: " . $e->getMessage());
+        die("Error processing note: " . $e->getMessage());
     }
 
-    
 } else {
     http_response_code(405);
     echo "Method Not Allowed";
