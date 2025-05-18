@@ -52,7 +52,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const noteColorPicker = document.getElementById('noteColor');
   const themeSelect = document.getElementById('themeToggle');
   const preview = document.getElementById('notePreview');
-  const noteText = preview.querySelector('.note-text');
+  let noteText = null;
+  if (preview) {
+    noteText = preview.querySelector('.note-text');
+  }
 
   if (fontSizeSelect && noteText) {
     fontSizeSelect.addEventListener('change', function () {
@@ -97,11 +100,16 @@ noteInput.addEventListener('blur', () => {
   }
 });
 
-// Xử lý xóa ghi chú
+// Xử lý xóa ghi chú (làm lại từ đầu)
+$(document).off('click', '.delete-note'); // Xóa event cũ nếu có
 $(document).on('click', '.delete-note', function(e) {
     e.preventDefault();
     const noteId = $(this).data('note-id');
-    
+    console.log('Delete clicked, noteId:', noteId);
+    if (!noteId) {
+        alert('Note ID không hợp lệ!');
+        return;
+    }
     if (confirm('Are you sure you want to delete this note?')) {
         $.ajax({
             url: '/Note/delete_note.php',
@@ -114,27 +122,33 @@ $(document).on('click', '.delete-note', function(e) {
                     $(`[data-note-id="${noteId}"]`).closest('.note-item').fadeOut(300, function() {
                         $(this).remove();
                     });
+                    alert('Note deleted successfully!');
                 } else {
                     alert(response.message || 'Failed to delete note');
                 }
             },
-            error: function() {
-                alert('An error occurred while deleting the note');
+            error: function(xhr) {
+                let msg = 'An error occurred while deleting the note';
+                if (xhr.responseText) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        msg = res.message || msg;
+                    } catch(e) {}
+                }
+                alert(msg);
             }
         });
     }
 });
 
 
-$(document).ready(function() {
-  $('.btn-edit-note').on('click', function(e) {
-    e.preventDefault();
-    const noteId = $(this).data('id');
+$(document).on('click', '.btn-edit-note', function(e) {
+  e.preventDefault();
+  const noteId = $(this).data('id');
 
-    $.get('Note/edit_note_modal.php?id=' + noteId, function(data) {
-      $('#editNoteModalContainer').html(data);
-      $('#editNoteModal').modal('show');
-    });
+  $.get('Note/edit_note_modal.php?id=' + noteId, function(data) {
+    $('#editNoteModalContainer').html(data);
+    $('#editNoteModal').modal('show');
   });
 });
 
@@ -253,6 +267,33 @@ document.addEventListener("DOMContentLoaded", function () {
         '"': '&quot;',
         "'": '&#39;'
       }[m];
+    });
+  }
+});
+
+$(document).on('click', '.pin-note', function(e) {
+  e.preventDefault();
+  const noteId = $(this).data('note-id');
+  
+  if (confirm('Are you sure you want to pin this note?')) {
+    $.ajax({
+      url: '/Note/pin_note.php',
+      method: 'POST',
+      data: { note_id: noteId },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          // Update UI
+          const icon = $(this).find('i');
+          icon.toggleClass('text-primary');
+          $(this).text(response.pinned ? 'Unpin' : 'Pin');
+        } else {
+          alert(response.message || 'Failed to pin note');
+        }
+      },
+      error: function() {
+        alert('An error occurred while pinning the note');
+      }
     });
   }
 });
