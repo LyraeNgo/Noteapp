@@ -42,6 +42,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             
             // Now verify the password
             if (password_verify($pass, $row['password'])) {
+                $_SESSION['user_id'] = $row['id'];
                 $_SESSION['username'] = $row['display_name'];
                 header("Location: /index.php");
                 exit(); 

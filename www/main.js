@@ -1,28 +1,48 @@
-// This view mode wrote by Bac 
-    /*
-    // View mode switching
-    
-    const notesContainer = document.querySelector("#notes-container");
+window.addEventListener("DOMContentLoaded", () => {
+  let createNote = document.querySelector("#create");
+  let showForm = document.querySelector("#note-form");
+  createNote.addEventListener("click", () => {
+    showForm.style.display = "block";
+  });
 
-  
+  // View mode switching
+  let viewMode = localStorage.getItem('viewMode') || 'grid';
 
+  const gridViewBtn = document.querySelector("#grid-view");
+  const listViewBtn = document.querySelector("#list-view");
+  const notesContainer = document.querySelector("#notes-container");
 
-  gridViewBtn.addEventListener("click", () => {
-    console.log("Grid view clicked");
+  // Apply saved view mode on load
+  if (viewMode === 'grid') {
     notesContainer.classList.remove("list-view");
     notesContainer.classList.add("grid-view");
     gridViewBtn.classList.add("active");
     listViewBtn.classList.remove("active");
-  });
-
-  listViewBtn.addEventListener("click", () => {
-    console.log("List view clicked");
+  } else {
     notesContainer.classList.add("list-view");
     notesContainer.classList.remove("grid-view");
     listViewBtn.classList.add("active");
     gridViewBtn.classList.remove("active");
+  }
+
+  gridViewBtn.addEventListener("click", () => {
+    notesContainer.classList.remove("list-view");
+    notesContainer.classList.add("grid-view");
+    gridViewBtn.classList.add("active");
+    listViewBtn.classList.remove("active");
+    localStorage.setItem('viewMode', 'grid');
   });
+
+  listViewBtn.addEventListener("click", () => {
+    notesContainer.classList.add("list-view");
+    notesContainer.classList.remove("grid-view");
+    listViewBtn.classList.add("active");
+    gridViewBtn.classList.remove("active");
+    localStorage.setItem('viewMode', 'list');
+  });
+
 });
+
 
 
 
@@ -54,10 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-*/
-
-
-  // Dùng JavaScript (auto-save mỗi 300ms)
 let lastSavedContent = '';
 const noteInput = document.querySelector('#noteForm textarea[name="content"]');
 
@@ -65,7 +81,6 @@ noteInput.addEventListener('blur', () => {
   const form = document.getElementById('noteForm');
   const formData = new FormData(form);
   const currentContent = formData.get('content');
-
 
   // Kiểm tra nếu nội dung đã thay đổi
   if (currentContent !== lastSavedContent) {
@@ -80,92 +95,94 @@ noteInput.addEventListener('blur', () => {
         console.error('Lỗi khi lưu note:', err);
       });
   }
+});
 
-  timeout = setTimeout(() => {
-    const form = document.getElementById('noteForm');
-    const formData = new FormData(form);
-    const currentContent = formData.get('content'); 
-
-    // Chỉ lưu khi nội dung thay đổi
-    if (currentContent !== lastSavedContent) {
-      fetch('Note/save_note.php', { method: 'POST', body: formData })
-        .then(() => {
-          lastSavedContent = currentContent;
-          location.reload(); // Cập nhật lại nội dung đã lưu
-        })
-        .catch(err => {
-          console.error('Lỗi khi lưu note:', err);
+// Xử lý xóa ghi chú
+$(document).on('click', '.delete-note', function(e) {
+    e.preventDefault();
+    const noteId = $(this).data('note-id');
+    
+    if (confirm('Are you sure you want to delete this note?')) {
+        $.ajax({
+            url: '/Note/delete_note.php',
+            method: 'POST',
+            data: { note_id: noteId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Xóa ghi chú khỏi giao diện
+                    $(`[data-note-id="${noteId}"]`).closest('.note-item').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                } else {
+                    alert(response.message || 'Failed to delete note');
+                }
+            },
+            error: function() {
+                alert('An error occurred while deleting the note');
+            }
         });
     }
-  }, 300);
-
 });
 
- 
 
+// search
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById('searchInput');
+  const notesContainer = document.getElementById('notes-container');
 
-function toggleView(view) {
-  const container = document.getElementById('notesContainer');
+  let debounceTimeout;
 
-  if (!container) {
-    console.error('Không tìm thấy #notesContainer');
-    return;
-  }
+  searchInput.addEventListener('input', function () {
+    clearTimeout(debounceTimeout);
 
-  if (view === 'grid') {
-    container.classList.remove('list-group');
-    container.classList.add('row', 'row-cols-3');
-    gridViewBtn.classList.add("active");
-    listViewBtn.classList.remove("active");
-  } else if (view === 'list') {
-    container.classList.remove('row', 'row-cols-3');
-    container.classList.add('list-group');
-    listViewBtn.classList.add("active");
-    gridViewBtn.classList.remove("active");
-  }
-}
+    debounceTimeout = setTimeout(() => {
+      const query = searchInput.value.trim();
 
-document.querySelectorAll('.pin_btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const noteId = btn.dataset.noteId;
-        
-        try {
-            const response = await fetch('pin_note.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `note_id=${noteId}`
-            });
+      fetch(`www/Note/search_notes.php?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            notesContainer.innerHTML = '<p>Error: ' + data.error + '</p>';
+            return;
+          }
 
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                // Update UI
-                const icon = btn.querySelector('i');
-                icon.classList.toggle('text-primary', result.pinned);
-                btn.innerHTML = `
-                    ${result.pinned ? 'Bỏ ghim' : 'Ghim'}
-                    <i class="fas fa-thumbtack ${result.pinned ? 'text-primary' : ''}"></i>
-                `;
-                
-                // Optionally reorder notes
-                location.reload(); // Hoặc cập nhật DOM động
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-});
+          if (data.length === 0) {
+            notesContainer.innerHTML = '<p>No matching notes found.</p>';
+            return;
+          }
 
-$(document).ready(function() {
-  $('.btn-edit-note').on('click', function(e) {
-    e.preventDefault();
-    const noteId = $(this).data('id');
+          // Build HTML from notes
+          let html = '';
+          data.forEach(note => {
+            html += `
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+                <div class="border rounded p-3 shadow-sm h-100 bg-white">
+                  <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">${escapeHtml(note.tieu_de)}</div>
+                  <div class="text-muted text-truncate" style="max-width: 100%;">${escapeHtml(note.noi_dung)}</div>
+                </div>
+              </div>`;
+          });
 
-    $.get('Note/edit_note_modal.php?id=' + noteId, function(data) {
-      $('#editNoteModalContainer').html(data);
-      $('#editNoteModal').modal('show');
-    });
+          notesContainer.innerHTML = html;
+        })
+        .catch(err => {
+          notesContainer.innerHTML = '<p>Error fetching notes.</p>';
+          console.error(err);
+        });
+    }, 300); // debounce 300ms
   });
+
+  // Helper to escape HTML special chars
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
+    });
+  }
 });
