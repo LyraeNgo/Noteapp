@@ -262,7 +262,7 @@ $user_id = $_SESSION['user_id'];
 $labels = $conn->query("SELECT * FROM label WHERE user_id = $user_id");
 ?>
 
-<select name="label_ids" multiple class="form-control mb-3">
+<select name="label_ids" multiple class="form-control mb-3" id="noteForm">
   <?php while($label = $labels->fetch_assoc()): ?>
     <option value="<?= $label['id'] ?>"><?= htmlspecialchars($label['name']) ?></option>
   <?php endwhile; ?>
