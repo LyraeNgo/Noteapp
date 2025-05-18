@@ -189,7 +189,6 @@
           </div>
         </div>
       </div>
-        </div>
           <?php
               endwhile;
               $stmt->close();
