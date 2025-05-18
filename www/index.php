@@ -5,17 +5,17 @@
     header("Location: /pages/login.php");
     die();
   }
-  if (isset($_SESSION["user_id"])) {
-    echo $_SESSION["user_id"];
-  }
+
 
   $conn=create_connection();
+
+
   $theme = $_SESSION['theme'] ?? 'light';
   $fontSize = $_SESSION['fontSize'] ?? 'medium';
   $noteColor = $_SESSION['noteColor'] ?? '#ffffff';
 
 // Map font size
-  $fontMap = ['small' => '14px', 'medium' => '16px', 'large' => '20px'];
+  $fontMap = ['small' => '14px', 'medium' => '20px', 'large' => '30px'];
   $fontSizePx = $fontMap[$fontSize] ?? '16px';
 
 ?>
@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="/style.css"/>
   <title>Home Page</title>
 </head>
-<body class="<?= $theme === 'dark' ? 'dark-mode' : '' ?>" style="font-size: <?= $fontSizePx ?>;">
+<body class="<?= $theme === 'dark' ? 'dark-mode' : '' ?>" style="font-size: <?= $fontSizePx ?>; ">
 
   <!-- Navigation -->
   <div class="container-fluid bg-light py-2">
@@ -89,37 +89,44 @@
   <div class="container text-center my-4 bg-dark text-white">
     <h1 >WELCOME TO NOTETATION, <?= $_SESSION['username'] ?></h1>
   </div>
+<!-- Create + Search + View Toggle  -->
+<div class="container mb-4">
+  <div class="row align-items-center">
 
-  <!-- Create + Search -->
-  <div class="container mb-4">
-    <div class="row align-items-center">
-      <div class="col-12 col-md-3 mb-2">
-        <button type="button" id="create" class="btn btn-warning w-100" data-toggle="modal" data-target="#myModal">Create Note</button>
-      </div>
-      <div class="col-12 col-md-9">
-        <form action="" method="get">
-            <div class="input-group">
-              <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
-            <div class="input-group-append">
-              <button type="submit" class="btn btn-primary">Find</button>
-            </div>
-          </div>
-        </form>
-
-      </div>
-    
-      <div class="col-12 col-md-2 mb-2">
-        <div class="btn-group w-100">
-          <button class="btn btn-outline-primary active" id="grid-view"  >
-            <i class="fas fa-th-large"></i>
-          </button>
-          <button class="btn btn-outline-primary" id="list-view">
-            <i class="fas fa-list"></i>
-          </button>
-        </div>
-      </div>
-      
+    <!-- Create Note Button -->
+    <div class="col-md-3 ">
+      <button type="button" id="create" class="btn btn-warning w-100" data-toggle="modal" data-target="#myModal">
+        Create Note
+      </button>
     </div>
+
+    <!-- Search Input -->
+    <div class="col-md-6">
+      <form action="" method="get">
+        <div class="input-group">
+          <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search notes..." />
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-primary">Find</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- View Toggle Buttons -->
+    <div class="col-md-3 ">
+      <div class="btn-group w-100 justify-content-end">
+        <button class="btn btn-outline-primary active" id="grid-view">
+          <i class="fas fa-th-large"></i>
+        </button>
+        <button class="btn btn-outline-primary" id="list-view">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
   </div>
   <!-- Note Form by TaPu-->
 <div id="myModal" class="modal fade" role="dialog">
@@ -154,7 +161,7 @@
 
 <!-- Note Display -->
   <div class="container">
-  <div id="notesContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+  <div id="notes-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" >
     
     <?php
     require_once('admin/db-con.php');
@@ -177,36 +184,52 @@
 
         while ($note = $result->fetch_assoc()):
     ?>
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 note-item" >
         
-        <div class="border rounded p-3 shadow-sm h-100 bg-white">
-          
-          <!-- Title -->
-          <div class="font-weight-bold text-truncate mb-2" style="max-width: 100%;">
-            <?= htmlspecialchars($note['tieu_de']) ?>
-            <?php if ($note['is_pinned']): ?>📌<?php endif; ?>
-            
-          </div>
+        <div class="border rounded p-3 shadow-sm h-100"style="background-color: <?= $noteColor?>;" >
 
-          <!-- Content + kebab menu -->
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="text-muted text-truncate" style="max-width: 85%;">
-              <?= htmlspecialchars($note['noi_dung']) ?>
-            </div>
+  <!-- Title + Pin -->
+  <div class="font-weight-bold text-truncate mb-2 d-flex justify-content-between align-items-start" style="max-width: 100%;">
+    <div class="text-truncate">
+      <?= htmlspecialchars($note['tieu_de']) ?>
+      <?php if ($note['is_pinned']): ?>
+        <i class="fa-solid fa-thumbtack"></i>
+      <?php endif; ?>
+    </div>
+  </div>
 
-              <div class="dropdown ml-2">
-                <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
-                  <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
-                </button>
-              <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="Note/pin_note.php?id=<?= $note['id'] ?>" >Pinned</a>
-                <a class="dropdown-item btn-edit-note" href="#" data-id="<?= $note['id'] ?>">Modify</a>
-                <a class="dropdown-item text-danger" href="">Delete</a>
-              </div>
-            </div>
-            <div id="editNoteModalContainer"></div>
-          </div>
-        </div>
+  <!-- Content + Kebab -->
+  <div class="d-flex justify-content-between align-items-start">
+    
+    <!-- Note content -->
+    <div class="text-muted text-truncate pr-2" style="max-width: 90%;">
+      <?= htmlspecialchars($note['noi_dung']) ?>
+    </div>
+
+    <!-- Kebab dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-sm btn-light p-1" type="button" data-toggle="dropdown" aria-expanded="false">
+        <span class="text-dark"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="Note/pin_note.php?id=<?= $note['id'] ?>">
+  <?php if ($note['is_pinned']): ?>
+    <i class="fa-solid fa-circle-xmark"></i> Unpin
+  <?php else: ?>
+    <i class="fa-solid fa-thumbtack"></i> Pin
+  <?php endif; ?>
+</a>
+
+
+        <a class="dropdown-item btn-edit-note" href="#" data-id="<?= $note['id'] ?>"><i class="fa-solid fa-pen"></i> Modify</a>
+        <a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-trash-can"></i> Delete</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="editNoteModalContainer"></div>
+</div>
+
       </div>
           <?php
               endwhile;

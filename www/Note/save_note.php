@@ -79,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Lỗi xử lý: " . $e->getMessage());
     }
 
-    $conn->close();
     
 } else {
     http_response_code(405);
